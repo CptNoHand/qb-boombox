@@ -54,3 +54,26 @@ RegisterNetEvent('qb-boombox:client:pickupBoombox', function()
     Citizen.Wait(500)
     ClearPedTasks(PlayerPedId())
 end)
+
+CreateThread(function()
+    while true do
+        local sleep = 1000
+        if LocalPlayer.state['isLoggedIn'] then
+            local ped = PlayerPedId()
+            local coords    = GetEntityCoords(ped)
+            local object = GetClosestObjectOfType(coords, 3.0, GetHashKey('prop_boombox_01'), false, false, false)
+            if DoesEntityExist(object) then
+                local objCoords = GetEntityCoords(object)
+                if #(coords - objCoords) < 4 then
+                  currentData = NetworkGetNetworkIdFromEntity(object)
+                    helpText('Press ~INPUT_CONTEXT~ to pickup.')
+                    if IsControlJustReleased(0, 38) then
+                        TriggerEvent('qb-boombox:client:pickupBoombox')
+                    end
+                    sleep = 5
+                end
+            end
+        end
+        Wait(sleep)
+    end
+end)
